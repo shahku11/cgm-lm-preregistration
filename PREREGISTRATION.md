@@ -101,6 +101,16 @@ The training-time arms have never been run.
 
 **Arms.** `signal_and_facts`, `signal_only`, `facts_only` (`carina_conditioning_ablation.sbatch`).
 
+**Numerical amendment, 2026-08-31, before any `facts_only` result existed.** The literal
+all-zero soft prefix made Qwen3-8B's first teacher-forced loss non-finite under each of
+`flash_attention_2`, `sdpa`, and `eager` (failed jobs 75440_2, 75699_2, and 75707_2). The
+`facts_only` arm therefore uses a length-matched, fixed repetition of the tokenizer null-token
+embedding. It is detached, identical for every sample, and contains no CGM information. This
+preserves the declared scientific contrast (facts but no signal) while keeping the decoder on
+its valid embedding manifold. The separately named `zero_signal_*` evaluation interventions
+remain literal zeros, so the internal positive control is unchanged. No `facts_only`
+checkpoint, metric, or generation existed when this amendment was written.
+
 **Two-stage design, declared before submission.**
 
 - **Stage A**: 3 arms × seed 42, `DEC_EPOCHS=4`, all subjects, 1,536 generation samples.
@@ -266,6 +276,43 @@ declaring an analysis of data whose schema is unknown:
   sequence in `docs/SLEEPLM_ALIGNMENT_AND_RUN_PLAN.md` steps 5–7 governs it)
 - both human studies (gated on IRB; `docs/HUMAN_EVALUATION_PROTOCOL.md` locks the instruments
   and still lacks a sample size — that power calculation is a prerequisite, not a formality)
+
+---
+
+## 8. Confirmatory C-peptide construct-validity rerun
+
+**Declared 2026-09-01, before the confirmatory rerun.** Existing C-peptide results are
+exploratory: the endpoint, metric, band structure, and comparison family were selected after
+the microvascular null was known. The exploratory morphology increment has raw p = 0.019 and
+Holm-adjusted p = 0.095 over the five-endpoint family. Those observations motivated this
+confirmatory design and are not evidence from the confirmatory run.
+
+| field | locked value |
+|---|---|
+| primary endpoint | `c_peptide`, continuous |
+| statistic | Spearman correlation with subject-clustered uncertainty and per-block CV penalty selection |
+| primary test | morphology over prespecified covariates plus glycaemic exposure |
+| secondary test | embedding over morphology, pretrained versus matched untrained |
+| negative controls | `uacr`, `nt_probnp`, `qtcf_ms`, `rate_bpm`; at least 20 label permutations |
+| effect to beat | Δρ ≥ +0.0068, the lower bound of the exploratory estimate |
+| multiplicity | Holm over the endpoint × arm family |
+| calibration floor | out-of-fold band hit rate ≥ 0.5 against a 0.333 chance baseline |
+
+**Stopping and reporting rule.** The complete declared endpoint × arm family is reported. A
+failed or missing cell cannot be omitted, and no threshold or family member may be changed
+after the first confirmatory output exists. The primary claim requires both the direction and
+effect-size requirement above; nominal significance alone is insufficient.
+
+**Declared against interest.** The current permutation null tests the rung statistic, not the
+increment, so a permutation test of the increment remains necessary. The matched untrained
+embedding has produced the same calibrated band as the pretrained embedding and must be
+reported alongside it. Four of eight verifier corruption families currently use a single
+fixed injected string matched by patterns containing that string; this limits verifier claims
+until a larger held-out corruption set is evaluated.
+
+This section licenses no run until this exact document is externally timestamped, committed,
+and pushed to a public remote. `python -m cgm_lm.preregistration` must report both
+`externally_timestamped: true` and `content_matches_commit: true` before submission.
 
 ---
 
